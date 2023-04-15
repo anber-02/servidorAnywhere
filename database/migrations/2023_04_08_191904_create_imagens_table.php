@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('public_id');
             $table->string('nombre');//nombre de la imagen
             $table->string('url');
-            $table->unsignedBigInteger('tiendas_id');
+            // $table->unsignedBigInteger('tiendas_id');
 
-            $table->foreign('tiendas_id')->references('idTiendas')->on('tiendas');
+            // $table->foreign('tiendas_id')->references('idTiendas')->on('tiendas');
             $table->timestamps();
         });
     }

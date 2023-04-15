@@ -15,8 +15,8 @@ class RestauranteController extends Controller
     public function getRestaurantes(){
         // Obtiene cada tienda con sus comentario e imagenes
         // $restaurantes = Restaurantes::with('imagenes', 'comentarios')->paginate(4);
-        // $restaurantes = Restaurantes::with('imagenes')->paginate(4);
-        $restaurantes = Restaurantes::with('comentarios')->paginate(4);
+        $restaurantes = Restaurantes::with('imagenes')->paginate(4);
+        // $restaurantes = Restaurantes::with('comentarios')->paginate(4);
         return response()->json($restaurantes, 200);
     }
 
@@ -49,9 +49,7 @@ class RestauranteController extends Controller
             'contacto_correo' => $request->contacto_correo,
         ]);
         
-        $images = array();
         if($request->hasFile('imagen')){
-
             $files = $request->file('imagen');
             $url = "";
             foreach($files as $file){
@@ -60,15 +58,44 @@ class RestauranteController extends Controller
                 $public_id = $obj->getPublicId();
                 $tipo = $obj->getFileType();
                 $nombre = $obj->getOriginalFileName();
-                $images[] = Imagen::create([
+
+
+                // $images[] = Imagen::create([
+                //     'tipo' => $tipo,
+                //     'nombre' => $nombre,
+                //     'public_id' => $public_id,
+                //     'url' => $url,
+                //     'tiendas_id' => $restaurante->idTiendas
+                // ]);
+
+                // Prueba de guardar imagenes
+                $imagen = Imagen::create([
                     'tipo' => $tipo,
                     'nombre' => $nombre,
                     'public_id' => $public_id,
                     'url' => $url,
-                    'tiendas_id' => $restaurante->idTiendas
                 ]);
+
+
+                $restaurante->imagenes()->attach($imagen->id);
+                // if ($request->hasFile('imagenes')) {
+                //     foreach ($request->file('imagenes') as $imagen) {
+                //         $path = $imagen->store('public/imagenes');
+                //         $url = Storage::url($path);
+        
+                //         $imagen = new Imagen;
+                //         $imagen->url = $url;
+                //         $imagen->save();
+        
+                //         $producto->imagenes()->attach($imagen->id, ['principal' => false]);
+                //     }
+        
+                //     // Asociar la primera imagen como principal
+                //     $producto->imagenes()->first()->pivot->principal = true;
+                //     $producto->imagenes()->first()->pivot->save();
+                // }
             }
-            $restaurante->imagenes = $images;
+            $restaurante->imagenes;
         }
         return response()->json([
             "data" => $restaurante,

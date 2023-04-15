@@ -13,8 +13,8 @@ class HotelController extends Controller
     public function getHoteles(){
         // Obtiene cada tienda con sus comentario e imagenes
         // $tiendas = Tiendas::with('imagenes', 'comentarios')->paginate(4);
-        // $hoteles = Hoteles::with('imagenes')->paginate(4);
-        $hoteles = Hoteles::with('comentarios')->paginate(4);
+        $hoteles = Hoteles::with('imagenes')->paginate(4);
+        // $hoteles = Hoteles::with('comentarios')->paginate(4);
         return response()->json($hoteles, 200);
     }
 
@@ -46,8 +46,7 @@ class HotelController extends Controller
             'contacto_tel' => $request->contacto_tel,
             'contacto_correo' => $request->contacto_correo,
         ]);
-        
-        $images = array();
+
         if($request->hasFile('imagen')){
 
             $files = $request->file('imagen');
@@ -58,15 +57,17 @@ class HotelController extends Controller
                 $public_id = $obj->getPublicId();
                 $tipo = $obj->getFileType();
                 $nombre = $obj->getOriginalFileName();
-                $images[] = Imagen::create([
+                $imagen = Imagen::create([
                     'tipo' => $tipo,
                     'nombre' => $nombre,
                     'public_id' => $public_id,
                     'url' => $url,
-                    'tiendas_id' => $hotel->idTiendas
                 ]);
+
+
+                $hotel->imagenes()->attach($imagen->id);
             }
-            $hotel->imagenes = $images;
+            $hotel->imagenes;
         }
         return response()->json([
             "data" => $hotel,

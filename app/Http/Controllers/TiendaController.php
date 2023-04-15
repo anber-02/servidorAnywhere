@@ -49,7 +49,6 @@ class TiendaController extends Controller
             'contacto_correo' => $request->contacto_correo,
         ]);
         
-        $images = array();
         if($request->hasFile('imagen')){
 
             $files = $request->file('imagen');
@@ -60,15 +59,17 @@ class TiendaController extends Controller
                 $public_id = $obj->getPublicId();
                 $tipo = $obj->getFileType();
                 $nombre = $obj->getOriginalFileName();
-                $images[] = Imagen::create([
+                $imagen = Imagen::create([
                     'tipo' => $tipo,
                     'nombre' => $nombre,
                     'public_id' => $public_id,
                     'url' => $url,
-                    'tiendas_id' => $tienda->idTiendas
                 ]);
+
+
+                $tienda->imagenes()->attach($imagen->id);
             }
-            $tienda->imagenes = $images;
+            $tienda->imagenes;
         }
         return response()->json([
             "data" => $tienda,

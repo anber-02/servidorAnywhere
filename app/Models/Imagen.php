@@ -9,7 +9,7 @@ class Imagen extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tipo', 'nombre', 'public_id', 'url', 'extension', 'tiendas_id'];
+    protected $fillable = ['tipo', 'nombre', 'public_id', 'url', 'extension'];
 
     public function tiendas(){
         return $this->belongsTo(User::class, 'tiendas_id');

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\RestauranteController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\UserController;
@@ -25,14 +26,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('auth', [AuthController::class, 'auth']);
 // proteger las rutas con el middleware
-Route::get('user-profile', [AuthController::class, 'userProfile']);
-Route::group(['middleware' => ['auth:sanctum']], function (){
+Route::middleware('jwt.verify')->group(function (){
     Route::get('user-profile', [AuthController::class, 'userProfile']);
-    Route::get('logout', [AuthController::class, 'logout']);
+    Route::get('users', [UserController::class, 'getUsers']);
 });
 
 
-Route::get('users', [UserController::class, 'getUsers']);
 // RUTAS DE TIENDAS
 Route::post('nuevaTienda', [TiendaController::class, 'saveTienda']);
 Route::get('tiendas', [TiendaController::class, 'getTiendas']);
@@ -48,3 +47,6 @@ Route::post('nuevoRestaurante', [RestauranteController::class, 'saveRestaurante'
 Route::get('restaurantes', [RestauranteController::class, 'getRestaurantes']);
 Route::get('restaurante/{id}', [RestauranteController::class, 'getRestauranteById']);
 Route::put('restaurante/{id}', [RestauranteController::class, 'updateRestaurante']);
+
+//RUTA DE IMAGENES
+Route::delete('imagen/{id}', [ImagenController::class, 'deleteImagen']);

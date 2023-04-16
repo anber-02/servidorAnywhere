@@ -22,7 +22,7 @@ class Tiendas extends Model
     }
 
     public function imagenes(){
-        return $this->hasMany(Imagen::class, 'tiendas_id');
+        return $this->belongsToMany(Imagen::class, 'imagenes_has_tiendas','tiendas_idTiendas','imagens_id');
     }
 
     protected static function newFactory()

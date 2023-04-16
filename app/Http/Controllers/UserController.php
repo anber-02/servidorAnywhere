@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     //
     public function getUsers(){
-        $users = User::with('comentarios')->get();
+        $users = User::all();
 
         // $products = Product::where('estado', 1)
         // ->addSelect(['categoria' => Category::select('nombre')->whereColumn('category_id', 'id')])

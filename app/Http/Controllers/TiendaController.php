@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Imagen;
 use App\Models\Tiendas;
+use App\Models\Comentarios;
 use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Facades\Validator;
@@ -23,9 +24,14 @@ class TiendaController extends Controller
     public function getTiendaById($id){
         $tienda = Tiendas::find($id);
         $imagenes = $tienda->imagenes;
-        $comentarios = $tienda->comentarios;
+        $comentarios = $tienda->comentarios()->with('users')
+        ->get();
+
+        $tienda->comentarios = $comentarios;
+
         return response()->json([
-            'tienda' => $tienda
+            'tienda' => $tienda,
+            // 'comentarios' => $comentarios
         ],200);
     }
 
@@ -83,14 +89,13 @@ class TiendaController extends Controller
             'contacto_tel' => 'required | string | min:10',
             'contacto_correo' => 'required | string | email | unique:tiendas',
         ]);
-
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        
 
-        $tienda = Tiendas::find($id);
+        $tienda = Tiendas::findOrFail($id);
+        $imagenes = $tienda->imagenes()->get();
         $tienda->update([
             'nombre' => $request->nombre,
             'direccion' => $request->direccion,
@@ -98,25 +103,35 @@ class TiendaController extends Controller
             'contacto_correo' => $request->contacto_correo,
         ]);
         // imagen a actualizar
+
+        if ($request->hasFile('imagen')) {
+            $files = $request->file('imagen');
+            foreach ($files as $file) {
+                $obj = Cloudinary::upload($file->getRealPath(), ['folder' => 'anywhere/tiendas']);
+                $url = $obj->getSecurePath();
+                $public_id = $obj->getPublicId();
+                $tipo = $obj->getFileType();
+                $nombre = $obj->getOriginalFileName();
+
+                $imagen = Imagen::create([
+                    'tipo' => $tipo,
+                    'nombre' => $nombre,
+                    'public_id' => $public_id,
+                    'url' => $url,
+                ]);
         
-        if($request->hasFile('imagen')){
-            $imagen = Imagen::find($request->id);
-            Cloudinary::destroy($imagen->public_id);
-            $file = $request->file('imagen');
-            $obj = Cloudinary::upload($file->getRealPath(), ['folder' => 'anywhere/tiendas']);
-            $url = $obj->getSecurePath();
-            $public_id = $obj->getPublicId();
-            $tipo = $obj->getFileType();
-            $nombre = $obj->getOriginalFileName();
-            $imagen->update([
-                'tipo' => $tipo,
-                'nombre' => $nombre,
-                'public_id' => $public_id,
-                'url' => $url,
-                'tiendas_id' => $tienda->idTiendas
-            ]);
-            $tienda->imagenes = $imagen;
+                $tienda->imagenes()->attach($imagen->id);
+            }
+            // Asociar la primera imagen como principal
+            // $producto->imagenes()->first()->pivot->principal = true;
+            // $producto->imagenes()->first()->pivot->save();
         }
+        $imagenesDesasociadas = $imagenes->diff($tienda->imagenes());
+        foreach ($imagenesDesasociadas as $imagen) {
+            $imagen->delete();
+        }
+
+        $tienda->imagenes;
         return response()->json([
             "data" => $tienda,
         ], 201);

@@ -11,7 +11,7 @@ class Comentarios extends Model
     use HasFactory;
 
     public function users(){
-        return $this->belongsTo(User::class, 'comentarios_has_tiendas', 'comentarios_idComen', 'tiendas_idTiendas');
+        return $this->belongsTo(User::class,'usuarios_idUsuarios');
     }
 
     public function tiendas(){

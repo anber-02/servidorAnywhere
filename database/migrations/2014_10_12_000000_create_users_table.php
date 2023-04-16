@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('num_tel');
-            $table->string('tipo')->default('normal');
+            $table->string('tipo')->default('normal')->nullable();
             $table->string('url_image')->nullable();
             $table->string('public_id')->nullable();
             $table->rememberToken();

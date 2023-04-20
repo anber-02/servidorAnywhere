@@ -9,6 +9,8 @@ class Comentarios extends Model
 {
     protected $primaryKey = 'idComen';
     use HasFactory;
+   
+    protected $fillable = ["comentario", "usuarios_idUsuarios"];
 
     public function users(){
         return $this->belongsTo(User::class,'usuarios_idUsuarios');

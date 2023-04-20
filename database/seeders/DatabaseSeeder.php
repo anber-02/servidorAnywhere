@@ -25,13 +25,13 @@ class DatabaseSeeder extends Seeder
         // ]);
         // \App\Models\Tiendas::factory(20)->create();
 
-        \App\Models\Tiendas::factory(20)
+        \App\Models\Tiendas::factory(10)
         ->has(Comentarios::factory(10))
         ->create();
-        \App\Models\Restaurantes::factory(20)
+        \App\Models\Restaurantes::factory(10)
         ->has(Comentarios::factory(10))
         ->create();;
-        \App\Models\Hoteles::factory(20)
+        \App\Models\Hoteles::factory(10)
         ->has(Comentarios::factory(10))
         ->create();;
         

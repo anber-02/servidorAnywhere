@@ -37,7 +37,8 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'url_image' => $url,
-                'public_id' => $public_id
+                'public_id' => $public_id,
+                'tipo' => $request->tipo
             ]);
             return response()->json(['user' => $user], 201);
         }
@@ -74,11 +75,24 @@ class AuthController extends Controller
             "user" => $user
         ]);
     }
+    public function userProfile($id){
+        $user = User::find($id);
+        $comentarios = $user->comentarios()->with('users')
+        ->get();
 
-    public function userProfile(Request $request){
+        $user->comentarios = $comentarios;
         return response()->json([
             "msg"=>"user profile", 
-            "data" => auth()->user()
+            "data" => $user
         ], 200);
+    }
+
+    public function logout(){
+        try{
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(["msg" => "sesion cerrada correctamente"]);
+        }catch(JWTException $e){
+            return response()->json(["msg" => "ocurrio un error al cerrar sesion"]);
+        }
     }
 }

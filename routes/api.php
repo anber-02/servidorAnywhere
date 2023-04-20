@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\RestauranteController;
@@ -27,7 +28,7 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('auth', [AuthController::class, 'auth']);
 // proteger las rutas con el middleware
 Route::middleware('jwt.verify')->group(function (){
-    Route::get('user-profile', [AuthController::class, 'userProfile']);
+    Route::get('user-profile/{id}', [AuthController::class, 'userProfile']);
     Route::get('users', [UserController::class, 'getUsers']);
 });
 
@@ -37,16 +38,22 @@ Route::post('nuevaTienda', [TiendaController::class, 'saveTienda']);
 Route::get('tiendas', [TiendaController::class, 'getTiendas']);
 Route::get('tienda/{id}', [TiendaController::class, 'getTiendaById']);
 Route::put('tienda/{id}', [TiendaController::class, 'updateTienda']);
+Route::delete('tienda/{id}', [TiendaController::class, 'deleteTienda']);
 // RUTAS DE HOOTELES
 Route::post('nuevoHotel', [HotelController::class, 'saveHotel']);
 Route::get('hoteles', [HotelController::class, 'getHoteles']);
 Route::get('hotel/{id}', [HotelController::class, 'getHotelById']);
-Route::put('hote;/{id}', [HotelController::class, 'updateHotel']);
+Route::put('hotel/{id}', [HotelController::class, 'updateHotel']);
+Route::delete('hotel/{id}', [HotelController::class, 'deleteHotel']);
 // RUTAS DE RESTAURANTEs
 Route::post('nuevoRestaurante', [RestauranteController::class, 'saveRestaurante']);
 Route::get('restaurantes', [RestauranteController::class, 'getRestaurantes']);
 Route::get('restaurante/{id}', [RestauranteController::class, 'getRestauranteById']);
 Route::put('restaurante/{id}', [RestauranteController::class, 'updateRestaurante']);
+Route::delete('restaurante/{id}', [RestauranteController::class, 'deleteRestaurante']);
 
 //RUTA DE IMAGENES
 Route::delete('imagen/{id}', [ImagenController::class, 'deleteImagen']);
+
+// RUTA COMMENTARIOS
+Route::post('comentario', [ComentarioController::class, 'createComement']);

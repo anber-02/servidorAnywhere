@@ -17,37 +17,51 @@ class TiendaController extends Controller
     public function getTiendas(){
         // Obtiene cada tienda con sus comentario e imagenes
         // $tiendas = Tiendas::with('imagenes', 'comentarios')->paginate(4);
-        $tiendas = Tiendas::with('imagenes')->paginate(4);
+        $tiendas = Tiendas::with('imagenes')->paginate(10);
         return response()->json($tiendas, 200);
     }
 
     public function getTiendaById($id){
         $tienda = Tiendas::find($id);
+        if(is_null($tienda)){
+            return response()->json(['mensaje' => 'tienda no encontrada'], 404);
+        }
         $imagenes = $tienda->imagenes;
         $comentarios = $tienda->comentarios()->with('users')
         ->get();
 
+
         $tienda->comentarios = $comentarios;
 
         return response()->json([
-            'tienda' => $tienda,
+            'data' => $tienda,
             // 'comentarios' => $comentarios
         ],200);
     }
 
 
     public function saveTienda(Request $request){
-        // $request->headers->set('Content-Type', 'multipart/form-data');
+        $request->headers->set('Content-Type', 'multipart/form-data');
         $validator = Validator::make($request -> all(), [
             'nombre' => 'required | string | max:255',
             'direccion' => 'required | string | max:255',
-            'contacto_tel' => 'required | string | min:10',
+            'contacto_tel' => 'required | string',
             'contacto_correo' => 'required | string | email | unique:tiendas',
         ]);
 
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
         }
+
+    //     if($request->hasFile('imagen')){
+
+    //         return response()->json(['Hay imagen']);
+    //     }
+
+    //     return response()->json([
+    //         'prueba' => $request->nombre
+    // ]);
+
         $tienda = Tiendas::create([
             'nombre' => $request->nombre,
             'direccion' => $request->direccion,
@@ -56,7 +70,6 @@ class TiendaController extends Controller
         ]);
         
         if($request->hasFile('imagen')){
-
             $files = $request->file('imagen');
             $url = "";
             foreach($files as $file){
@@ -87,7 +100,7 @@ class TiendaController extends Controller
             'nombre' => 'required | string | max:255',
             'direccion' => 'required | string | max:255',
             'contacto_tel' => 'required | string | min:10',
-            'contacto_correo' => 'required | string | email | unique:tiendas',
+            // 'contacto_correo' => 'required | string | email | unique:tiendas',
         ]);
         if($validator->fails()){
             return response()->json(['errors' => $validator->errors()], 422);
@@ -126,14 +139,23 @@ class TiendaController extends Controller
             // $producto->imagenes()->first()->pivot->principal = true;
             // $producto->imagenes()->first()->pivot->save();
         }
-        $imagenesDesasociadas = $imagenes->diff($tienda->imagenes());
-        foreach ($imagenesDesasociadas as $imagen) {
-            $imagen->delete();
-        }
+        // $imagenesDesasociadas = $imagenes->diff($tienda->imagenes());
+        // foreach ($imagenesDesasociadas as $imagen) {
+        //     $imagen->delete();
+        // }
 
         $tienda->imagenes;
         return response()->json([
             "data" => $tienda,
         ], 201);
+    }
+
+    public function deleteTienda($id){
+        $tienda = Tiendas::find($id);
+        if(is_null($tienda)){
+            return response()->json(['mensaje' => 'tienda no encontrada'], 404);
+        }
+        $tienda->delete();
+        return response( ['Producto eliminado'], 203);
     }
 }
